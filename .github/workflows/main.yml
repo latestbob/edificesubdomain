@@ -1,0 +1,41 @@
+name: Deploy to EC2 nginx
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v3
+
+    - name: executing remote ssh commands using ssh key
+      uses: appleboy/ssh-action@v1.2.0
+      with:
+        host: ${{ secrets.HOST }}
+        username: ${{ secrets.USERNAME }}
+        key: ${{ secrets.KEY }}
+        port: ${{ secrets.PORT }}
+        script: |
+         
+          cd /var/www/subdomain
+
+           # Mark the directory as safe for Git
+          git config --global --add safe.directory /var/www/subdomain
+
+          
+           # Remove old contents
+         
+          sudo rm -rf edificesubdomain
+
+          # Clone the repository
+         
+          sudo git clone https://github.com/latestbob/edificesubdomain.git edificesubdomain
+
+          # Restart NGINX
+          
+          sudo systemctl restart nginx
